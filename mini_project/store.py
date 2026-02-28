@@ -1,7 +1,7 @@
 import os
 import requests
 import psycopg2
-from datetime import date
+from datetime import date, timedelta
 from fastapi import FastAPI
 from dotenv import load_dotenv
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -26,90 +26,86 @@ def get_db_connection():
 
 # --------------------------------------------------
 # Sync Function
-# Inserts all released Malayalam movies (<= today)
-# Skips duplicates automatically
+# Runs daily and checks only yesterday → today releases
 # --------------------------------------------------
 
-def sync_released_movies():
+def sync_new_releases():
 
     today = date.today().isoformat()
+    yesterday = (date.today() - timedelta(days=1)).isoformat()
+
     url = "https://api.themoviedb.org/3/discover/movie"
 
-    page = 1
-    inserted_count = 0
+    params = {
+        "api_key": TMDB_API_KEY,
+        "with_original_language": "ml",
+        "primary_release_date.gte": yesterday,
+        "primary_release_date.lte": today,
+        "sort_by": "primary_release_date.desc",
+        "page": 1
+    }
+
+    response = requests.get(url, params=params)
+
+    if response.status_code != 200:
+        print("TMDB Error:", response.status_code, response.text)
+        return
+
+    data = response.json()
+    results = data.get("results", [])
+
+    if not results:
+        print("No new Malayalam releases today.")
+        return
 
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    MAX_PAGES = 5
-    page = 1
+    inserted_count = 0
 
-    while page <= MAX_PAGES:
+    for movie in results:
 
-        params = {
-            "api_key": TMDB_API_KEY,
-            "with_original_language": "ml",
-            "primary_release_date.lte": today,
-            "sort_by": "primary_release_date.desc",
-            "page": page
-        }
+        cursor.execute("""
+            INSERT INTO movies (tmdb_id, title, poster_path, release_date, overview)
+            VALUES (%s, %s, %s, %s, %s)
+            ON CONFLICT (tmdb_id) DO NOTHING;
+        """, (
+            movie["id"],
+            movie["title"],
+            movie.get("poster_path"),
+            movie.get("release_date"),
+            movie.get("overview")
+        ))
 
-        response = requests.get(url, params=params)
-
-        if response.status_code != 200:
-            print("TMDB Error:", response.status_code, response.text)
-            break
-
-        data = response.json()
-        results = data.get("results", [])
-
-        if not results:
-            break
-
-        for movie in results:
-            cursor.execute("""
-                INSERT INTO movies (tmdb_id, title, poster_path, release_date, overview)
-                VALUES (%s, %s, %s, %s, %s)
-                ON CONFLICT (tmdb_id) DO NOTHING;
-            """, (
-                movie["id"],
-                movie["title"],
-                movie.get("poster_path"),
-                movie.get("release_date"),
-                movie.get("overview")
-            ))
-
-            if cursor.rowcount > 0:
-                inserted_count += 1
-
-        page += 1
-
-        if page > data.get("total_pages", 1):
-            break
+        if cursor.rowcount > 0:
+            inserted_count += 1
 
     conn.commit()
     cursor.close()
     conn.close()
 
-    print(f"{inserted_count} movies inserted.")
+    if inserted_count > 0:
+        print(f"{inserted_count} new movies inserted.")
+    else:
+        print("Movies already exist. No new inserts.")
 
 # --------------------------------------------------
-# Manual Sync Endpoint
+# Manual Trigger Endpoint
 # --------------------------------------------------
 
 @app.get("/sync")
 def manual_sync():
-    sync_released_movies()
+    sync_new_releases()
     return {"message": "Sync completed"}
 
 # --------------------------------------------------
-# Scheduler (10 AM IST)
+# Scheduler - Runs every day at 10 AM IST
 # --------------------------------------------------
 
 scheduler = BackgroundScheduler(timezone="Asia/Kolkata")
 
 scheduler.add_job(
-    sync_released_movies,
+    sync_new_releases,
     trigger="cron",
     hour=10,
     minute=0

@@ -41,7 +41,10 @@ def sync_released_movies():
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    while True:
+    MAX_PAGES = 5
+    page = 1
+
+    while page <= MAX_PAGES:
 
         params = {
             "api_key": TMDB_API_KEY,

@@ -1,14 +1,10 @@
 import os
 import requests
 import psycopg2
-from datetime import date, timedelta
+from datetime import date
 from fastapi import FastAPI
 from dotenv import load_dotenv
 from apscheduler.schedulers.background import BackgroundScheduler
-
-# --------------------------------------------------
-# Load Environment Variables
-# --------------------------------------------------
 
 load_dotenv()
 
@@ -17,29 +13,22 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 
 app = FastAPI()
 
-# --------------------------------------------------
-# Database Connection
-# --------------------------------------------------
+START_DATE = "2026-02-25"   # Only movies after this date
 
 def get_db_connection():
     return psycopg2.connect(DATABASE_URL)
 
-# --------------------------------------------------
-# Sync Function
-# Runs daily and checks only yesterday → today releases
-# --------------------------------------------------
 
 def sync_new_releases():
 
     today = date.today().isoformat()
-    yesterday = (date.today() - timedelta(days=1)).isoformat()
 
     url = "https://api.themoviedb.org/3/discover/movie"
 
     params = {
         "api_key": TMDB_API_KEY,
         "with_original_language": "ml",
-        "primary_release_date.gte": yesterday,
+        "primary_release_date.gte": START_DATE,
         "primary_release_date.lte": today,
         "sort_by": "primary_release_date.desc",
         "page": 1
@@ -55,7 +44,7 @@ def sync_new_releases():
     results = data.get("results", [])
 
     if not results:
-        print("No new Malayalam releases today.")
+        print("No new Malayalam releases found.")
         return
 
     conn = get_db_connection()
@@ -64,7 +53,6 @@ def sync_new_releases():
     inserted_count = 0
 
     for movie in results:
-
         cursor.execute("""
             INSERT INTO movies (tmdb_id, title, poster_path, release_date, overview)
             VALUES (%s, %s, %s, %s, %s)
@@ -87,20 +75,14 @@ def sync_new_releases():
     if inserted_count > 0:
         print(f"{inserted_count} new movies inserted.")
     else:
-        print("Movies already exist. No new inserts.")
+        print("No new movies to insert.")
 
-# --------------------------------------------------
-# Manual Trigger Endpoint
-# --------------------------------------------------
 
 @app.get("/sync")
 def manual_sync():
     sync_new_releases()
     return {"message": "Sync completed"}
 
-# --------------------------------------------------
-# Scheduler - Runs every day at 10 AM IST
-# --------------------------------------------------
 
 scheduler = BackgroundScheduler(timezone="Asia/Kolkata")
 
@@ -113,9 +95,6 @@ scheduler.add_job(
 
 scheduler.start()
 
-# --------------------------------------------------
-# Health Check
-# --------------------------------------------------
 
 @app.get("/")
 def root():

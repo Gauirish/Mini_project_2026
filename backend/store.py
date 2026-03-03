@@ -1,31 +1,29 @@
+import json
 import os
-import requests
 import psycopg2
-from datetime import date
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
-from apscheduler.schedulers.background import BackgroundScheduler
+from pydantic import BaseModel
+
+from model import analyze
 
 load_dotenv()
 
-TMDB_API_KEY = os.getenv("TMDB_API_KEY")
-
 app = FastAPI()
 
-# ✅ Enable CORS (VERY IMPORTANT for React frontend)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # for development
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-START_DATE = "2026-01-01"
+# =========================
+# DATABASE CONNECTION
+# =========================
 
-
-# ✅ Database Connection
 def get_db_connection():
     return psycopg2.connect(
         host="aws-1-ap-southeast-2.pooler.supabase.com",
@@ -36,76 +34,111 @@ def get_db_connection():
         sslmode="require"
     )
 
+# =========================
+# AI REVIEW ENDPOINT
+# =========================
 
-# ✅ Fetch and Insert Movies from TMDB
-def sync_new_releases():
+class ReviewRequest(BaseModel):
+    movie_id: str
+    review: str
 
-    today = date.today().isoformat()
 
-    url = "https://api.themoviedb.org/3/discover/movie"
+@app.post("/analyze-review")
+def analyze_review(data: ReviewRequest):
 
-    params = {
-        "api_key": TMDB_API_KEY,
-        "with_original_language": "ml",
-        "primary_release_date.gte": START_DATE,
-        "primary_release_date.lte": today,
-        "sort_by": "primary_release_date.desc",
-        "page": 1
-    }
-
-    headers = {
-        "User-Agent": "Mozilla/5.0"
-    }
-
-    response = requests.get(url, params=params, headers=headers, timeout=10)
-
-    if response.status_code != 200:
-        print("TMDB Error:", response.status_code, response.text)
-        return
-
-    data = response.json()
-    results = data.get("results", [])
-
-    if not results:
-        print("No new Malayalam releases found.")
-        return
+    result = analyze(data.review)
 
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    inserted_count = 0
+    cursor.execute("""
+        INSERT INTO reviews (movie_id, review_text, rating, sentiment, aspects)
+        VALUES (%s, %s, %s, %s, %s)
+        RETURNING id;
+    """, (
+        data.movie_id,
+        data.review,
+        result["rating"],
+        result["sentiment"],
+        json.dumps(result["aspects"])
+    ))
 
-    for movie in results:
-        cursor.execute("""
-            INSERT INTO movies (tmdb_id, title, poster_path, release_date, overview)
-            VALUES (%s, %s, %s, %s, %s)
-            ON CONFLICT (tmdb_id) DO NOTHING;
-        """, (
-            movie["id"],
-            movie["title"],
-            movie.get("poster_path"),
-            movie.get("release_date"),
-            movie.get("overview")
-        ))
+    review_id = cursor.fetchone()[0]
 
-        if cursor.rowcount > 0:
-            inserted_count += 1
+    # Update movie average rating
+    cursor.execute("""
+        UPDATE movies
+        SET avg_rating = (
+            SELECT COALESCE(AVG(rating), 0)
+            FROM reviews
+            WHERE movie_id = %s
+        )
+        WHERE id = %s;
+    """, (data.movie_id, data.movie_id))
 
     conn.commit()
     cursor.close()
     conn.close()
 
-    print(f"{inserted_count} new movies inserted.")
+    return {
+        "review_id": review_id,
+        "rating": result["rating"],
+        "sentiment": result["sentiment"],
+        "aspects": result["aspects"]
+    }
 
+# =========================
+# AGGREGATED ASPECTS ENDPOINT
+# =========================
 
-# ✅ Manual Sync Endpoint
-@app.get("/sync")
-def manual_sync():
-    sync_new_releases()
-    return {"message": "Sync completed"}
+@app.get("/movie-aspects/{movie_id}")
+def get_movie_aspects(movie_id: str):
 
+    conn = get_db_connection()
+    cursor = conn.cursor()
 
-# ✅ NEW: Get All Movies (For Frontend)
+    cursor.execute("""
+        SELECT aspects
+        FROM reviews
+        WHERE movie_id = %s
+    """, (movie_id,))
+
+    rows = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    # Default structure
+    aggregated = {
+        "acting": [],
+        "story": [],
+        "bgm": [],
+        "direction": [],
+        "visuals": []
+    }
+
+    for row in rows:
+        aspects = row[0]
+        if aspects:
+            for key in aggregated:
+                value = aspects.get(key)
+                if value is not None:
+                    aggregated[key].append(value)
+
+    averaged = {}
+
+    for key, values in aggregated.items():
+        if values:
+            averaged[key] = round(sum(values) / len(values), 1)
+        else:
+            averaged[key] = 0
+
+    return averaged
+
+# =========================
+# GET MOVIES
+# =========================
+
 @app.get("/movies")
 def get_movies():
     conn = get_db_connection()
@@ -119,7 +152,6 @@ def get_movies():
 
     rows = cursor.fetchall()
     columns = [desc[0] for desc in cursor.description]
-
     movies = [dict(zip(columns, row)) for row in rows]
 
     cursor.close()
@@ -128,19 +160,43 @@ def get_movies():
     return movies
 
 
-# ✅ Scheduler (Daily 10 AM)
-scheduler = BackgroundScheduler(timezone="Asia/Kolkata")
-
-scheduler.add_job(
-    sync_new_releases,
-    trigger="cron",
-    hour=10,
-    minute=0
-)
-
-scheduler.start()
-
-
 @app.get("/")
 def root():
     return {"status": "Backend running"}
+
+# =========================
+# GET HIGHLIGHT REVIEWS
+# =========================
+
+@app.get("/movie-highlights/{movie_id}")
+def get_movie_highlights(movie_id: str):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    # Get latest positive review
+    cursor.execute("""
+        SELECT review_text
+        FROM reviews
+        WHERE movie_id = %s AND sentiment = 'positive'
+        ORDER BY created_at DESC
+        LIMIT 1;
+    """, (movie_id,))
+    positive = cursor.fetchone()
+
+    # Get latest negative review
+    cursor.execute("""
+        SELECT review_text
+        FROM reviews
+        WHERE movie_id = %s AND sentiment = 'negative'
+        ORDER BY created_at DESC
+        LIMIT 1;
+    """, (movie_id,))
+    negative = cursor.fetchone()
+
+    cursor.close()
+    conn.close()
+
+    return {
+        "positive": positive[0] if positive else None,
+        "negative": negative[0] if negative else None
+    }

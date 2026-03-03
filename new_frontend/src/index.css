@@ -12,9 +12,9 @@ body {
   min-height: 100vh;
   line-height: 1.6;
 
-  background: radial-gradient(circle at 20% 20%, rgba(255,255,255,0.08), transparent 40%),
-              radial-gradient(circle at 80% 0%, rgba(255,255,255,0.06), transparent 40%),
-              linear-gradient(135deg, #141421, #0d0d16);
+  background: radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.08), transparent 40%),
+    radial-gradient(circle at 80% 0%, rgba(255, 255, 255, 0.06), transparent 40%),
+    linear-gradient(135deg, #141421, #0d0d16);
 
   color: #ffffff;
 }
@@ -31,13 +31,26 @@ body {
 }
 
 /* ===== Headings ===== */
-h1 { font-size: 28px; margin-bottom: 10px; }
-h2 { font-size: 22px; }
-h3 { font-size: 18px; }
+h1 {
+  font-size: 28px;
+  margin-bottom: 10px;
+}
 
-h1, h2, h3, h4 {
+h2 {
+  font-size: 22px;
+}
+
+h3 {
+  font-size: 18px;
+}
+
+h1,
+h2,
+h3,
+h4 {
   font-weight: 600;
-  color: #f8fafc;   /* soft white */
+  color: #f8fafc;
+  /* soft white */
 }
 
 /* ===== Buttons (Year Chips Included) ===== */
@@ -45,7 +58,8 @@ button {
   background-color: #ffffff;
   color: #1e293b;
   border: 1px solid #cbd5e1;
-  border-radius: 0;   /* FULL SHARP */
+  border-radius: 0;
+  /* FULL SHARP */
   padding: 8px 14px;
   transition: all 0.2s ease;
   cursor: pointer;
@@ -96,9 +110,10 @@ button:hover {
 .search-input {
   width: 100%;
   padding: 14px 18px 14px 45px;
-  border-radius: 0;  /* FULL SHARP */
-  border: 1px solid rgba(255,255,255,0.2);
-  background: rgba(255,255,255,0.08);
+  border-radius: 0;
+  /* FULL SHARP */
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.08);
   color: #ffffff;
   font-size: 15px;
   transition: all 0.3s ease;
@@ -169,11 +184,9 @@ button:hover {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    to top,
-    rgba(15, 23, 42, 0.25),
-    rgba(15, 23, 42, 0)
-  );
+  background: linear-gradient(to top,
+      rgba(15, 23, 42, 0.25),
+      rgba(15, 23, 42, 0));
   opacity: 0;
   transition: opacity 0.3s ease;
 }
@@ -182,14 +195,16 @@ button:hover {
   opacity: 1;
 }
 
-.movie-info { margin-top: 10px; }
+.movie-info {
+  margin-top: 10px;
+}
 
 .movie-title {
   font-size: 15px;
   font-weight: 600;
   color: #f8fafc;
   letter-spacing: 0.3px;
-  text-shadow: 0 1px 4px rgba(0,0,0,0.4);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
   transition: color 0.3s ease;
 }
 
@@ -216,8 +231,15 @@ button:hover {
 }
 
 @keyframes pageFade {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ===== Review Textarea Dark Style ===== */
@@ -231,7 +253,8 @@ textarea {
   background: rgba(255, 255, 255, 0.08);
   color: #ffffff;
   border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 0; /* keep sharp */
+  border-radius: 0;
+  /* keep sharp */
 
   backdrop-filter: blur(12px);
   font-size: 14px;
@@ -246,4 +269,174 @@ textarea:focus {
   outline: none;
   border-color: #3b82f6;
   box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+/* ===== Loading Screen ===== */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  width: 100%;
+  animation: fadeIn 0.5s ease forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(255, 255, 255, 0.1);
+  border-left-color: #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 20px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-text {
+  font-size: 18px;
+  font-weight: 500;
+  color: #94a3b8;
+  letter-spacing: 0.5px;
+  text-align: center;
+}
+
+/* ===== Auth Page Styles ===== */
+.auth-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.auth-container {
+  width: 100%;
+  max-width: 400px;
+  padding: 40px;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  text-align: center;
+  animation: pageFade 0.5s ease;
+}
+
+.auth-title {
+  font-size: 24px;
+  margin-top: 20px;
+  margin-bottom: 8px;
+  color: #ffffff;
+}
+
+.auth-subtitle {
+  font-size: 14px;
+  color: #94a3b8;
+  margin-bottom: 30px;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  text-align: left;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.input-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #cbd5e1;
+}
+
+.input-group input {
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 15px;
+  transition: all 0.3s ease;
+}
+
+.input-group input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.auth-button {
+  width: 100%;
+  padding: 14px;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 10px;
+}
+
+.auth-button:hover {
+  background: #2563eb;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+.auth-message {
+  margin-top: 20px;
+  font-size: 14px;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.auth-message.error {
+  background: rgba(239, 68, 68, 0.1);
+  color: #f87171;
+}
+
+.auth-message.success {
+  background: rgba(34, 197, 94, 0.1);
+  color: #4ade80;
+}
+
+.auth-toggle {
+  margin-top: 30px;
+  font-size: 14px;
+  color: #94a3b8;
+}
+
+.toggle-link {
+  background: none;
+  border: none;
+  color: #3b82f6;
+  font-weight: 600;
+  margin-left: 8px;
+  cursor: pointer;
+}
+
+.toggle-link:hover {
+  text-decoration: underline;
 }

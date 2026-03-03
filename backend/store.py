@@ -1,21 +1,22 @@
 import json
 import os
 import psycopg2
+import requests
+from datetime import datetime
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 from pydantic import BaseModel
 
-from model import analyze
 
 load_dotenv()
 
-app = FastAPI()
+main = FastAPI()
 
-app.add_middleware(
+main.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_credentials=True,
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -43,8 +44,12 @@ class ReviewRequest(BaseModel):
     review: str
 
 
-@app.post("/analyze-review")
+@main.post("/analyze-review")
 def analyze_review(data: ReviewRequest):
+    try:
+        from model import analyze
+    except ImportError:
+        return {"error": "AI analysis model is not ready. Please install dependencies or just use the sync feature."}
 
     result = analyze(data.review)
 
@@ -91,7 +96,7 @@ def analyze_review(data: ReviewRequest):
 # AGGREGATED ASPECTS ENDPOINT
 # =========================
 
-@app.get("/movie-aspects/{movie_id}")
+@main.get("/movie-aspects/{movie_id}")
 def get_movie_aspects(movie_id: str):
 
     conn = get_db_connection()
@@ -139,7 +144,7 @@ def get_movie_aspects(movie_id: str):
 # GET MOVIES
 # =========================
 
-@app.get("/movies")
+@main.get("/movies")
 def get_movies():
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -160,7 +165,7 @@ def get_movies():
     return movies
 
 
-@app.get("/")
+@main.get("/")
 def root():
     return {"status": "Backend running"}
 
@@ -168,7 +173,7 @@ def root():
 # GET HIGHLIGHT REVIEWS
 # =========================
 
-@app.get("/movie-highlights/{movie_id}")
+@main.get("/movie-highlights/{movie_id}")
 def get_movie_highlights(movie_id: str):
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -200,3 +205,58 @@ def get_movie_highlights(movie_id: str):
         "positive": positive[0] if positive else None,
         "negative": negative[0] if negative else None
     }
+
+# =========================
+# MOVIE SYNC (TMDB)
+# =========================
+
+@main.get("/sync")
+def sync_movies():
+    """Fetches movies released today from TMDB and adds them to the database."""
+    api_key = os.getenv("TMDB_API_KEY")
+    if not api_key:
+        return {"error": "TMDB_API_KEY missing"}
+
+    today = datetime.now().strftime("%Y-%m-%d")
+    tmdb_url = "https://api.themoviedb.org/3/discover/movie"
+    params = {
+        "api_key": api_key,
+        "primary_release_date.gte": today,
+        "primary_release_date.lte": today,
+        "language": "en-US",
+        "sort_by": "popularity.desc"
+    }
+
+    try:
+        response = requests.get(tmdb_url, params=params)
+        response.raise_for_status()
+        movies = response.json().get("results", [])
+    except Exception as e:
+        return {"error": str(e)}
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    added_count = 0
+
+    for movie in movies:
+        tmdb_id = movie.get("id")
+        title = movie.get("title")
+        poster_path = movie.get("poster_path")
+        release_date = movie.get("release_date")
+        overview = movie.get("overview")
+
+        cursor.execute("SELECT id FROM movies WHERE tmdb_id = %s", (str(tmdb_id),))
+        if cursor.fetchone():
+            continue
+
+        cursor.execute("""
+            INSERT INTO movies (tmdb_id, title, poster_path, release_date, overview, avg_rating)
+            VALUES (%s, %s, %s, %s, %s, %s)
+        """, (str(tmdb_id), title, poster_path, release_date, overview, 0))
+        added_count += 1
+
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+    return {"status": "success", "added_movies": added_count, "date": today}

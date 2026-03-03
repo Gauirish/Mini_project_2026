@@ -15,7 +15,7 @@ function Home() {
     const [isLoading, setIsLoading] = useState(true);
     const navigate = useNavigate();
 
-    const moviesPerPage = 16;
+    const moviesPerPage = 20;
 
     // ✅ Fetch movies from backend
     useEffect(() => {

@@ -5,9 +5,9 @@ body {
   min-height: 100vh;
   color: white;
 
-  background: radial-gradient(circle at 20% 20%, rgba(255,255,255,0.08), transparent 40%),
-              radial-gradient(circle at 80% 0%, rgba(255,255,255,0.06), transparent 40%),
-              linear-gradient(135deg, #141421, #0d0d16);
+  background: radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.08), transparent 40%),
+    radial-gradient(circle at 80% 0%, rgba(255, 255, 255, 0.06), transparent 40%),
+    linear-gradient(135deg, #141421, #0d0d16);
 }
 
 /* Main container */
@@ -111,13 +111,11 @@ body {
   text-align: center;
   display: inline-block;
 
-  background: linear-gradient(
-    90deg,
-    #00f5ff,
-    #3b82f6,
-    #8b5cf6,
-    #00f5ff
-  );
+  background: linear-gradient(90deg,
+      #00f5ff,
+      #3b82f6,
+      #8b5cf6,
+      #00f5ff);
   background-size: 200% auto;
 
   background-clip: text;
@@ -128,8 +126,7 @@ body {
   animation: logoShift 5s linear infinite;
 
   /* REAL glow */
-  filter: drop-shadow(0 0 8px rgba(0, 245, 255, 0.7))
-          drop-shadow(0 0 20px rgba(139, 92, 246, 0.6));
+  filter: drop-shadow(0 0 8px rgba(0, 245, 255, 0.7)) drop-shadow(0 0 20px rgba(139, 92, 246, 0.6));
 }
 
 /* Moving gradient */
@@ -147,8 +144,8 @@ body {
 .search-input {
   padding: 10px 14px 10px 35px;
   border-radius: 8px;
-  border: 1px solid rgba(255,255,255,0.2);
-  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.08);
   color: inherit;
 }
 
@@ -179,8 +176,7 @@ body {
 
   background:
     linear-gradient(#111827, #111827) padding-box,
-    linear-gradient(
-      90deg,
+    linear-gradient(90deg,
       red,
       orange,
       yellow,
@@ -188,8 +184,7 @@ body {
       cyan,
       blue,
       violet,
-      red
-    ) border-box;
+      red) border-box;
 
   background-size: 300% 100%;
   animation: rgb-border 6s linear infinite;
@@ -202,6 +197,7 @@ body {
   0% {
     background-position: 0% 50%;
   }
+
   100% {
     background-position: 300% 50%;
   }

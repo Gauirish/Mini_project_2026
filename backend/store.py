@@ -221,6 +221,7 @@ def sync_movies():
     tmdb_url = "https://api.themoviedb.org/3/discover/movie"
     params = {
         "api_key": api_key,
+        "with_original_language": "ml",
         "primary_release_date.gte": today,
         "primary_release_date.lte": today,
         "language": "en-US",

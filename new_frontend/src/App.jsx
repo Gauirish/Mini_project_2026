@@ -1,13 +1,13 @@
 import { useState, useMemo, useEffect } from "react";
 import { supabase } from "./supabaseClient";
-import Auth from "./pages/Auth";
+import Auth from "./pages/Auth.jsx";
 import { filterMovies } from "./utils/filtermovies";
 import { paginate } from "./utils/paginate";
-import Header from "./components/Header";
-import Filterchips from "./components/Filterchips";
-import Pagination from "./components/pagination";
-import Moviecard from "./components/Moviecard";
-import Moviedetail from "./components/Moviedetail";
+import Header from "./components/Header.jsx";
+import Filterchips from "./components/Filterchips.jsx";
+import Pagination from "./components/pagination.jsx";
+import Moviecard from "./components/Moviecard.jsx";
+import Moviedetail from "./components/Moviedetail.jsx";
 
 function App() {
   console.log("App Rendering - Supabase:", !!supabase);

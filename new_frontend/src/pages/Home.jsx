@@ -2,10 +2,11 @@ import { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { filterMovies } from "../utils/filtermovies";
 import { paginate } from "../utils/paginate";
-import Header from "../components/Header";
-import Filterchips from "../components/Filterchips";
-import Pagination from "../components/Pagination";
-import Moviecard from "../components/Moviecard";
+import Header from "./components/Header.jsx";
+import Filterchips from "./components/Filterchips.jsx";
+import Pagination from "./components/pagination.jsx";
+import Moviecard from "./components/Moviecard.jsx";
+import Moviedetail from "./components/Moviedetail.jsx";
 
 function Home() {
     const [moviesData, setMoviesData] = useState([]);

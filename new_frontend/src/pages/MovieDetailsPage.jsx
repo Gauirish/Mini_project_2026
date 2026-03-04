@@ -1,6 +1,6 @@
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import Moviedetail from "../components/moviedetail";
+import Moviedetail from "../components/Moviedetail";
 
 function MovieDetailsPage() {
     const { id } = useParams();
@@ -12,7 +12,7 @@ function MovieDetailsPage() {
     useEffect(() => {
         if (!movie) {
             setLoading(true);
-            fetch(`http://127.0.0.1:8000/movies/${id}`)
+            fetch(`https://miniproject2026-production.up.railway.app/movies/${id}`)
                 .then((res) => res.json())
                 .then((data) => {
                     setMovie(data);

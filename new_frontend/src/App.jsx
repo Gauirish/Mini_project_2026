@@ -5,9 +5,9 @@ import { filterMovies } from "./utils/filtermovies";
 import { paginate } from "./utils/paginate";
 import Header from "./components/Header";
 import Filterchips from "./components/Filterchips";
-import Pagination from "./components/Pagination";
+import Pagination from "./components/pagination";
 import Moviecard from "./components/Moviecard";
-import Moviedetail from "./components/moviedetail";
+import Moviedetail from "./components/Moviedetail";
 
 function App() {
   console.log("App Rendering - Supabase:", !!supabase);
@@ -48,7 +48,7 @@ function App() {
   useEffect(() => {
     if (!session) return;
     setIsLoading(true);
-    fetch("http://127.0.0.1:8000/movies")
+    fetch("https://miniproject2026-production.up.railway.app/movies")
       .then((res) => res.json())
       .then((data) => {
         setMoviesData(data);

@@ -20,7 +20,7 @@ function Home() {
     // ✅ Fetch movies from backend
     useEffect(() => {
         setIsLoading(true);
-        fetch("http://127.0.0.1:8000/movies")
+        fetch("https://miniproject2026-production.up.railway.app/movies")
             .then((res) => res.json())
             .then((data) => {
                 console.log("MOVIES FROM BACKEND:", data);

@@ -21,7 +21,7 @@ function Moviedetail({ movie, onBack }) {
   useEffect(() => {
     setAspectsLoading(true);
 
-    fetch(`http://127.0.0.1:8000/movie-aspects/${movie.id}`)
+    fetch(`https://miniproject2026-production.up.railway.app/movie-aspects/${movie.id}`)
       .then((res) => res.json())
       .then((data) => {
         setAspectAverages(data);
@@ -32,7 +32,7 @@ function Moviedetail({ movie, onBack }) {
 
   // Fetch highlight reviews
   useEffect(() => {
-    fetch(`http://127.0.0.1:8000/movie-highlights/${movie.id}`)
+    fetch(`https://miniproject2026-production.up.railway.app/movie-highlights/${movie.id}`)
       .then((res) => res.json())
       .then((data) => setHighlightReviews(data))
       .catch((err) => console.error(err));
@@ -44,7 +44,7 @@ function Moviedetail({ movie, onBack }) {
     setLoading(true);
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/analyze-review", {
+      const response = await fetch("https://miniproject2026-production.up.railway.app/analyze-review", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -58,7 +58,7 @@ function Moviedetail({ movie, onBack }) {
 
       // Refresh aspects after new review
       const refresh = await fetch(
-        `http://127.0.0.1:8000/movie-aspects/${movie.id}`
+        `https://miniproject2026-production.up.railway.app/movie-aspects/${movie.id}`
       );
       const updated = await refresh.json();
       setAspectAverages(updated);

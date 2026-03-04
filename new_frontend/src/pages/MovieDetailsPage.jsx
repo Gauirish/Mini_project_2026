@@ -2,7 +2,7 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Moviedetail from "../components/Moviedetail";
 
-function MovieDetailsPage() {
+function MovieDetailsPage({ session }) {
     const { id } = useParams();
     const location = useLocation();
     const navigate = useNavigate();
@@ -12,7 +12,7 @@ function MovieDetailsPage() {
     useEffect(() => {
         if (!movie) {
             setLoading(true);
-            fetch(`https://miniproject2026-production.up.railway.app/movies/${id}`)
+            fetch(`http://127.0.0.1:8000/movies/${id}`)
                 .then((res) => res.json())
                 .then((data) => {
                     setMovie(data);
@@ -26,14 +26,14 @@ function MovieDetailsPage() {
     }, [id, movie]);
 
     if (loading) {
-        return <div style={{ color: "white", padding: "20px" }}>Loading movie details...</div>;
+        return <div className="loading-container"><div className="spinner"></div><p style={{ color: "white" }}>Loading movie details...</p></div>;
     }
 
     if (!movie) {
         return (
-            <div style={{ color: "white", padding: "20px" }}>
+            <div style={{ color: "white", padding: "40px", textAlign: "center" }}>
                 <p>Movie not found.</p>
-                <button onClick={() => navigate("/")}>Go Home</button>
+                <button onClick={() => navigate("/")} className="secondary-btn-full" style={{ width: 'auto', marginTop: '20px' }}>Go Home</button>
             </div>
         );
     }
@@ -41,7 +41,7 @@ function MovieDetailsPage() {
     return (
         <Moviedetail
             movie={movie}
-            onBack={() => navigate("/")}
+            session={session}
         />
     );
 }

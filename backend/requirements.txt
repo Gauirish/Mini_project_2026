@@ -1,11 +1,13 @@
 fastapi
 uvicorn
-transformers
-torch --index-url https://download.pytorch.org/whl/cpu
-beautifulsoup4
 requests
+psycopg2-binary
+python-dotenv
+apscheduler
+transformers
+torch
 deep-translator
 langdetect
-apscheduler
-python-dotenv
-psycopg2-binary
+vaderSentiment
+numpy
+google-generativeai

@@ -6,6 +6,8 @@ function Auth() {
     const [loading, setLoading] = useState(false);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
     const [isSignUp, setIsSignUp] = useState(false);
     const [message, setMessage] = useState('');
 
@@ -16,7 +18,17 @@ function Auth() {
 
         try {
             if (isSignUp) {
-                const { error } = await supabase.auth.signUp({ email, password });
+                const { error } = await supabase.auth.signUp({
+                    email,
+                    password,
+                    options: {
+                        data: {
+                            first_name: firstName,
+                            last_name: lastName,
+                            full_name: `${firstName} ${lastName}`.trim()
+                        }
+                    }
+                });
                 if (error) throw error;
                 setMessage('Signup successful! Check your email for a confirmation link.');
             } else {
@@ -51,6 +63,32 @@ function Auth() {
                             required
                         />
                     </div>
+                    {isSignUp && (
+                        <div className="input-group">
+                            <label htmlFor="firstName">First Name</label>
+                            <input
+                                id="firstName"
+                                type="text"
+                                placeholder="Your first name"
+                                value={firstName}
+                                onChange={(e) => setFirstName(e.target.value)}
+                                required
+                            />
+                        </div>
+                    )}
+                    {isSignUp && (
+                        <div className="input-group">
+                            <label htmlFor="lastName">Last Name</label>
+                            <input
+                                id="lastName"
+                                type="text"
+                                placeholder="Your last name"
+                                value={lastName}
+                                onChange={(e) => setLastName(e.target.value)}
+                                required
+                            />
+                        </div>
+                    )}
                     <div className="input-group">
                         <label htmlFor="password">Password</label>
                         <input

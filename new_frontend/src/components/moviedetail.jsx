@@ -12,6 +12,7 @@ function Moviedetail({ movie, onBack }) {
     positive: null,
     negative: null
   });
+  const [error, setError] = useState(null);
 
   const posterUrl = movie.poster_path
     ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
@@ -42,6 +43,7 @@ function Moviedetail({ movie, onBack }) {
     if (!text) return;
 
     setLoading(true);
+    setError(null);
 
     try {
       const response = await fetch("https://miniproject2026-production.up.railway.app/analyze-review", {
@@ -54,6 +56,13 @@ function Moviedetail({ movie, onBack }) {
       });
 
       const data = await response.json();
+
+      if (data.error) {
+        setError(data.error);
+        setLoading(false);
+        return;
+      }
+
       setAnalysisResult(data);
 
       // Refresh aspects after new review
@@ -65,6 +74,7 @@ function Moviedetail({ movie, onBack }) {
 
     } catch (error) {
       console.error(error);
+      setError("Failed to connect to the analysis server. Please try again later.");
     }
 
     setLoading(false);
@@ -188,6 +198,20 @@ function Moviedetail({ movie, onBack }) {
       <Reviewbox onAnalyze={handleAnalyze} />
 
       {loading && <p>Analyzing with AI...</p>}
+
+      {error && (
+        <div style={{
+          marginTop: "15px",
+          padding: "10px",
+          backgroundColor: "rgba(239,68,68,0.1)",
+          border: "1px solid #ef4444",
+          color: "#ef4444",
+          borderRadius: "8px",
+          fontSize: "14px"
+        }}>
+          <strong>Error:</strong> {error}
+        </div>
+      )}
 
       {analysisResult && (
         <div style={{ marginTop: "20px" }}>

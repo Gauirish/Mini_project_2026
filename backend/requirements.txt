@@ -4,3 +4,7 @@ requests
 psycopg2-binary
 python-dotenv
 apscheduler
+transformers
+torch
+deep-translator
+langdetect

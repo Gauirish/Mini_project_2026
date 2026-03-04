@@ -14,5 +14,12 @@ export function filterMovies(movies, selectedYear, searchQuery) {
     );
   }
 
+  // Sorting by release date (recent first)
+  filtered.sort((a, b) => {
+    if (!a.release_date) return 1;
+    if (!b.release_date) return -1;
+    return new Date(b.release_date) - new Date(a.release_date);
+  });
+
   return filtered;
 }

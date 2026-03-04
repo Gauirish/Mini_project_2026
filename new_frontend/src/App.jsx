@@ -67,21 +67,7 @@ function App() {
   };
 
   // Generate years dynamically
-  const years = useMemo(() => {
-    const extractedYears = moviesData
-      .map((movie) =>
-        movie.release_date
-          ? new Date(movie.release_date).getFullYear()
-          : null
-      )
-      .filter(Boolean);
-
-    const uniqueYears = [...new Set(extractedYears)].sort(
-      (a, b) => b - a
-    );
-
-    return ["All", ...uniqueYears];
-  }, [moviesData]);
+  const years = ["All", 2026, 2025, 2024];
 
   // Filtering
   const filteredMovies = useMemo(() => {

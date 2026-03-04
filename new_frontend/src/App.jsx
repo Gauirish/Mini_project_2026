@@ -5,7 +5,7 @@ import { filterMovies } from "./utils/filtermovies";
 import { paginate } from "./utils/paginate";
 import Header from "./components/Header.jsx";
 import Filterchips from "./components/Filterchips.jsx";
-import Pagination from "./components/pagination.jsx";
+import Pagination from "./components/Pagination.jsx";
 import Moviecard from "./components/Moviecard.jsx";
 import Moviedetail from "./components/Moviedetail.jsx";
 

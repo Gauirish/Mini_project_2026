@@ -1,4 +1,4 @@
-import Reviewbox from "./reviewbox";
+import Reviewbox from "./Reviewbox.jsx";
 import StarRating from "./StarRating";
 import { useState, useEffect } from "react";
 

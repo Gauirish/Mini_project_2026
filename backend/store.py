@@ -11,9 +11,9 @@ from pydantic import BaseModel
 
 load_dotenv()
 
-main = FastAPI()
+app = FastAPI()
 
-main.add_middleware(
+app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
     allow_credentials=False,
@@ -44,7 +44,7 @@ class ReviewRequest(BaseModel):
     review: str
 
 
-@main.post("/analyze-review")
+@app.post("/analyze-review")
 def analyze_review(data: ReviewRequest):
     try:
         from model import analyze
@@ -96,7 +96,7 @@ def analyze_review(data: ReviewRequest):
 # AGGREGATED ASPECTS ENDPOINT
 # =========================
 
-@main.get("/movie-aspects/{movie_id}")
+@app.get("/movie-aspects/{movie_id}")
 def get_movie_aspects(movie_id: str):
 
     conn = get_db_connection()
@@ -144,7 +144,7 @@ def get_movie_aspects(movie_id: str):
 # GET MOVIES
 # =========================
 
-@main.get("/movies")
+@app.get("/movies")
 def get_movies():
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -165,7 +165,7 @@ def get_movies():
     return movies
 
 
-@main.get("/")
+@app.get("/")
 def root():
     return {"status": "Backend running"}
 
@@ -173,7 +173,7 @@ def root():
 # GET HIGHLIGHT REVIEWS
 # =========================
 
-@main.get("/movie-highlights/{movie_id}")
+@app.get("/movie-highlights/{movie_id}")
 def get_movie_highlights(movie_id: str):
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -210,7 +210,7 @@ def get_movie_highlights(movie_id: str):
 # MOVIE SYNC (TMDB)
 # =========================
 
-@main.get("/sync")
+@app.get("/sync")
 def sync_movies():
     """Fetches movies released today from TMDB and adds them to the database."""
     api_key = os.getenv("TMDB_API_KEY")

@@ -10,6 +10,7 @@ function Moviedetail({ movie, onBack, session }) {
   const [aspectsLoading, setAspectsLoading] = useState(true);
   const [offset, setOffset] = useState(0);
   const [hasMore, setHasMore] = useState(true);
+  const [animateBars, setAnimateBars] = useState(false);
 
   const user = session?.user;
   // Use metadata full_name or first_name, otherwise fallback to email
@@ -30,10 +31,13 @@ function Moviedetail({ movie, onBack, session }) {
 
   const fetchAspects = async () => {
     setAspectsLoading(true);
+    setAnimateBars(false); // Reset animation state
     try {
       const res = await fetch(`http://127.0.0.1:8000/movie-aspects/${movie.id}`);
       const data = await res.json();
       setAspectAverages(data);
+      // Small delay to ensure DOM is ready for transition
+      setTimeout(() => setAnimateBars(true), 100);
     } catch (err) {
       console.error(err);
     } finally {
@@ -163,8 +167,8 @@ function Moviedetail({ movie, onBack, session }) {
                       <div
                         className="aspect-bar-fill"
                         style={{
-                          width: `${percentage}%`,
-                          backgroundSize: `${(100 / percentage) * 100}% 100%` // This keeps the red->yellow->green gradient correctly scaled to the width
+                          width: animateBars ? `${percentage}%` : '0%',
+                          backgroundSize: `${(100 / percentage) * 100}% 100%`
                         }}
                       />
                     </div>

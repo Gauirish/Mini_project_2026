@@ -1,5 +1,7 @@
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 import numpy as np
+from deep_translator import GoogleTranslator
+from langdetect import detect
 import re
 
 analyzer = SentimentIntensityAnalyzer()
@@ -38,9 +40,22 @@ def sentiment_to_rating(compound):
 
     return float(round(rating, 1))
 
+def translate_to_english(text):
+
+    try:
+        lang = detect(text)
+
+        if lang != "en":
+            text = GoogleTranslator(source='auto', target='en').translate(text)
+
+    except:
+        pass
+
+    return text
+
 
 def analyze(review):
-
+    review = translate_to_english(review)
     sentences = split_sentences(review)
 
     aspect_scores = {}

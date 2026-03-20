@@ -58,3 +58,44 @@ Returning 20 recommendations.
 Returning 20 recommendations.
 [2026-03-05 07:04:04.983361] Rec request for user: b47813ac-7a7e-49ba-aacd-42fda197cc1e
 Returning 20 recommendations.
+[2026-03-05 07:15:19.914779] Rec request for user: b47813ac-7a7e-49ba-aacd-42fda197cc1e
+Returning 20 recommendations.
+[2026-03-05 07:15:22.274123] Rec request for user: b47813ac-7a7e-49ba-aacd-42fda197cc1e
+Returning 20 recommendations.
+[2026-03-05 07:16:33.883554] Rec request for user: b47813ac-7a7e-49ba-aacd-42fda197cc1e
+Returning 20 recommendations.
+[2026-03-05 07:16:36.136859] Rec request for user: b47813ac-7a7e-49ba-aacd-42fda197cc1e
+Returning 20 recommendations.
+[2026-03-05 09:33:47.315351] Rec request for user: b47813ac-7a7e-49ba-aacd-42fda197cc1e
+[2026-03-05 09:33:47.315351] Rec request for user: b47813ac-7a7e-49ba-aacd-42fda197cc1e
+TMDB Error: ('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))
+TMDB Error: ('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))
+[2026-03-05 09:34:00.381820] Rec request for user: b47813ac-7a7e-49ba-aacd-42fda197cc1e
+[2026-03-05 09:34:00.384007] Rec request for user: b47813ac-7a7e-49ba-aacd-42fda197cc1e
+Returning 20 recommendations.
+Returning 20 recommendations.
+[2026-03-05 09:34:44.067187] Rec request for user: b47813ac-7a7e-49ba-aacd-42fda197cc1e
+Returning 20 recommendations.
+[2026-03-05 09:34:48.655162] Rec request for user: b47813ac-7a7e-49ba-aacd-42fda197cc1e
+Returning 20 recommendations.
+[2026-03-06 19:03:08.935318] Rec request for user: b47813ac-7a7e-49ba-aacd-42fda197cc1e
+Returning 20 recommendations.
+Returning 20 recommendations.
+[2026-03-18 10:56:34.080276] Rec request for user: b47813ac-7a7e-49ba-aacd-42fda197cc1e
+TMDB Error: ('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))
+TMDB Error: ('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))
+[2026-03-18 10:56:48.023252] Rec request for user: b47813ac-7a7e-49ba-aacd-42fda197cc1e
+TMDB Error: ('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))
+[2026-03-18 10:56:52.115697] Rec request for user: b47813ac-7a7e-49ba-aacd-42fda197cc1e
+TMDB Error: ('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))
+[2026-03-18 10:57:07.263401] Rec request for user: b47813ac-7a7e-49ba-aacd-42fda197cc1e
+Returning 20 recommendations.
+[2026-03-18 10:57:11.355999] Rec request for user: b47813ac-7a7e-49ba-aacd-42fda197cc1e
+TMDB Error: ('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))
+[2026-03-20 03:08:43.825156] Rec request for user: b47813ac-7a7e-49ba-aacd-42fda197cc1e
+[2026-03-20 03:08:43.826398] Rec request for user: b47813ac-7a7e-49ba-aacd-42fda197cc1e
+TMDB Error: ('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))
+TMDB Error: ('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))
+[2026-03-20 13:33:03.029593] Rec request for user: b47813ac-7a7e-49ba-aacd-42fda197cc1e
+TMDB Error: ('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))
+TMDB Error: ('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))

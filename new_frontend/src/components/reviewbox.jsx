@@ -32,15 +32,15 @@ function Reviewbox({ onAnalyze }) {
           marginTop: "10px",
           resize: "vertical",
           borderRadius: "12px",
-          background: "rgba(255,255,255,0.05)",
-          border: "1px solid rgba(255, 255, 255, 0.15)", // Subtle border
-          color: "white",
+          background: "rgba(255,255,255,0.9)",
+          border: "1px solid rgba(0, 0, 0, 0.1)", // Subtle border
+          color: "#0f172a",
           fontSize: "15px",
           outline: "none",
           transition: "border-color 0.3s ease"
         }}
         onFocus={(e) => e.target.style.borderColor = "#3b82f6"}
-        onBlur={(e) => e.target.style.borderColor = "rgba(255, 255, 255, 0.15)"}
+        onBlur={(e) => e.target.style.borderColor = "rgba(0, 0, 0, 0.1)"}
       />
 
       <div style={{ marginTop: "12px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>

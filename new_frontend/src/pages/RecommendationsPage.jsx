@@ -86,45 +86,47 @@ function RecommendationsPage({ session }) {
             <main className="main-content">
                 <div className="top-section">
                     <h1 className="brand-title">Picked Just For You</h1>
-                    <p style={{ color: "#94a3b8", textAlign: 'center' }}>
+                    <p style={{ color: "#0f172a", textAlign: 'center' }}>
                         Based on your cinematic taste and review history
                     </p>
                 </div>
 
-                {loading ? (
-                    <div className="loading-container">
-                        <div className="spinner"></div>
-                        <p className="loading-text">According to your reviews, you would like to watch :)</p>
-                    </div>
-                ) : (movies.length === 0) ? (
-                    <div className="no-reviews-empty">
-                        <h2>{message || "No recommendations found"}</h2>
-                        <p>Try reviewing some more movies to help our AI understand your taste better!</p>
-                        <button onClick={() => navigate("/")} className="auth-button" style={{ width: 'auto', marginTop: '20px' }}>
-                            Start Reviewing
-                        </button>
-                    </div>
-                ) : (
-                    <div className="recommendations-container">
-                        <div className="movie-grid">
-                            {movies.map((movie) => (
-                                <div key={movie.id} className="recommendation-item">
-                                    <Moviecard
-                                        movie={movie}
-                                        onClick={() => handleMovieSelect(movie)}
-                                    />
-                                    {movie.ai_reason && (
-                                        <div className="ai-badge-tooltip">
-                                            ✨ {movie.ai_reason}
-                                        </div>
-                                    )}
-                                </div>
-                            ))}
+                {
+                    loading ? (
+                        <div className="loading-container">
+                            <div className="spinner"></div>
+                            <p className="loading-text">According to your reviews, you would like to watch :)</p>
                         </div>
-                    </div>
-                )}
-            </main>
-        </div>
+                    ) : (movies.length === 0) ? (
+                        <div className="no-reviews-empty">
+                            <h2>{message || "No recommendations found"}</h2>
+                            <p>Try reviewing some more movies to help our AI understand your taste better!</p>
+                            <button onClick={() => navigate("/")} className="auth-button" style={{ width: 'auto', marginTop: '20px' }}>
+                                Start Reviewing
+                            </button>
+                        </div>
+                    ) : (
+                        <div className="recommendations-container">
+                            <div className="movie-grid">
+                                {movies.map((movie) => (
+                                    <div key={movie.id} className="recommendation-item">
+                                        <Moviecard
+                                            movie={movie}
+                                            onClick={() => handleMovieSelect(movie)}
+                                        />
+                                        {movie.ai_reason && (
+                                            <div className="ai-badge-tooltip">
+                                                ✨ {movie.ai_reason}
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )
+                }
+            </main >
+        </div >
     );
 }
 

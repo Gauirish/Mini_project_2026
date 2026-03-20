@@ -65,7 +65,7 @@ function YourReviewsPage({ session }) {
             <main className="main-content">
                 <div className="top-section">
                     <h1 className="brand-title">Your Review History</h1>
-                    <p style={{ color: "#94a3b8", textAlign: 'center' }}>Total Analysis: {reviews.length}</p>
+                    <p style={{ color: "#0f172a", textAlign: 'center' }}>Total Analysis: {reviews.length}</p>
                 </div>
 
                 {loading ? (

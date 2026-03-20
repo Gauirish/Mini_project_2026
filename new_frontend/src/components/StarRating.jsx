@@ -19,7 +19,7 @@ function StarRating({ rating, size = 22 }) {
             position: "relative",
             display: "inline-block",
             fontSize: size,
-            color: "#374151"
+            color: "#94a3b8"
           }}
         >
           ★
@@ -39,7 +39,7 @@ function StarRating({ rating, size = 22 }) {
       );
     } else {
       stars.push(
-        <span key={i} style={{ color: "#374151", fontSize: size }}>
+        <span key={i} style={{ color: "#94a3b8", fontSize: size }}>
           ★
         </span>
       );

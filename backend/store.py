@@ -8,9 +8,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 from pydantic import BaseModel
 import math
-
-
-
 load_dotenv()
 
 app = FastAPI()
@@ -22,11 +19,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# =========================
-# DATABASE CONNECTION
-# =========================
-
 def get_db_connection():
     return psycopg2.connect(
         host="aws-1-ap-southeast-2.pooler.supabase.com",
@@ -61,13 +53,21 @@ def analyze_review(data: ReviewRequest):
     # Run sentiment analysis
     result = analyze(data.review)
 
+    # If meaningless, don't store and return error
+    if result.get("is_meaningless", False):
+        return {
+            "error": "Meaningless Review",
+            "message": result.get("message", "Your review seems to be meaningless."),
+            "is_meaningless": True
+        }
+
     conn = get_db_connection()
     cursor = conn.cursor()
 
     # Insert review
     cursor.execute("""
-        INSERT INTO reviews (movie_id, review_text, rating, sentiment, aspects, user_id, user_name)
-        VALUES (%s, %s, %s, %s, %s, %s, %s)
+        INSERT INTO reviews (movie_id, review_text, rating, sentiment, aspects, user_id, user_name, is_spam)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
         RETURNING id;
     """, (
         data.movie_id,
@@ -76,21 +76,23 @@ def analyze_review(data: ReviewRequest):
         result["sentiment"],
         json.dumps(result["aspects"]),
         data.user_id,
-        data.user_name
+        data.user_name,
+        result.get("is_spam", False)
     ))
 
     review_id = cursor.fetchone()[0]
 
-    # Update movie average rating
-    cursor.execute("""
-        UPDATE movies
-        SET avg_rating = (
-            SELECT COALESCE(AVG(rating),0)
-            FROM reviews
-            WHERE movie_id=%s
-        )
-        WHERE id=%s;
-    """, (data.movie_id, data.movie_id))
+    # Only update movie average rating if NOT spam
+    if not result.get("is_spam", False):
+        cursor.execute("""
+            UPDATE movies
+            SET avg_rating = (
+                SELECT COALESCE(AVG(rating),0)
+                FROM reviews
+                WHERE movie_id=%s AND is_spam=FALSE
+            )
+            WHERE id=%s;
+        """, (data.movie_id, data.movie_id))
 
     conn.commit()
 
@@ -101,7 +103,9 @@ def analyze_review(data: ReviewRequest):
         "review_id": review_id,
         "rating": result["rating"],
         "sentiment": result["sentiment"],
-        "aspects": result["aspects"]
+        "aspects": result["aspects"],
+        "is_spam": result.get("is_spam", False),
+        "message": result.get("message")
     }
 
 # =========================
@@ -115,7 +119,7 @@ def get_movie_reviews_list(movie_id: str, limit: int = 5, offset: int = 0):
     cursor.execute("""
         SELECT id, review_text, rating, sentiment, aspects, user_name, created_at
         FROM reviews
-        WHERE movie_id = %s
+        WHERE movie_id = %s AND (is_spam = FALSE OR is_spam IS NULL)
         ORDER BY created_at DESC
         LIMIT %s OFFSET %s
     """, (movie_id, limit, offset))
@@ -145,7 +149,7 @@ def get_movie_aspects(movie_id: str):
     cursor.execute("""
         SELECT aspects
         FROM reviews
-        WHERE movie_id = %s
+        WHERE movie_id = %s AND (is_spam = FALSE OR is_spam IS NULL)
     """, (movie_id,))
 
     rows = cursor.fetchall()
@@ -271,7 +275,7 @@ def sync_movies():
     params = {
         "api_key": api_key,
         "with_original_language": "ml",
-        "primary_release_date.gte": today,
+        "primary_release_date.gte": "2026-03-18",
         "primary_release_date.lte": today,
         "language": "en-US",
         "sort_by": "popularity.desc"
@@ -301,9 +305,9 @@ def sync_movies():
             continue
 
         cursor.execute("""
-            INSERT INTO movies (tmdb_id, title, poster_path, release_date, overview, avg_rating, genres)
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
-        """, (str(tmdb_id), title, poster_path, release_date, overview, 0, json.dumps(genre_ids)))
+            INSERT INTO movies (tmdb_id, title, poster_path, release_date, overview, avg_rating)
+            VALUES (%s, %s, %s, %s, %s, %s)
+        """, (str(tmdb_id), title, poster_path, release_date, overview, 0))
         added_count += 1
 
     conn.commit()

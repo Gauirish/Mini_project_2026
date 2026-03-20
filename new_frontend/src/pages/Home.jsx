@@ -117,7 +117,7 @@ function Home({ session, handleLogout }) {
                                     />
                                 ))
                             ) : (
-                                <p style={{ color: "white", padding: "20px" }}>No movies to display.</p>
+                                <p style={{ color: "#0f172a", padding: "20px" }}>No movies to display.</p>
                             )}
                         </div>
 

@@ -24,6 +24,12 @@ def update_schema():
     try:
         cursor.execute("ALTER TABLE reviews ADD COLUMN IF NOT EXISTS user_id TEXT;")
         cursor.execute("ALTER TABLE reviews ADD COLUMN IF NOT EXISTS user_name TEXT;")
+        cursor.execute("ALTER TABLE reviews ADD COLUMN IF NOT EXISTS is_spam BOOLEAN DEFAULT FALSE;")
+        
+        # 3. Add genres column to movies table
+        print("Increasing 'movies' table to include genres...")
+        cursor.execute("ALTER TABLE movies ADD COLUMN IF NOT EXISTS genres JSONB;")
+        
         conn.commit()
         print("Schema updated successfully!")
     except Exception as e:

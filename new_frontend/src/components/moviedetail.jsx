@@ -11,6 +11,7 @@ function Moviedetail({ movie, onBack, session }) {
   const [offset, setOffset] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const [animateBars, setAnimateBars] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
 
   const user = session?.user;
   // Use metadata full_name or first_name, otherwise fallback to email
@@ -94,6 +95,19 @@ function Moviedetail({ movie, onBack, session }) {
       });
 
       const data = await response.json();
+      setLoading(false);
+
+      if (data.is_meaningless) {
+        setAlertMessage(data.message || "⚠️ This review is invalid or meaningless.");
+        setTimeout(() => setAlertMessage(""), 5000);
+        return false; // Don't clear input, let user fix it
+      }
+
+      if (data.is_spam) {
+        setAlertMessage(data.message || "⚠️ This review was flagged as spam and will not affect ratings.");
+        setTimeout(() => setAlertMessage(""), 5000);
+        return true;
+      }
 
       // Add to local state immediately for instant feedback
       const newReview = {
@@ -123,7 +137,34 @@ function Moviedetail({ movie, onBack, session }) {
   };
 
   return (
-    <div style={{ padding: "40px" }}>
+    <div style={{ padding: "40px", position: "relative" }}>
+      {alertMessage && (
+        <div style={{
+          position: "fixed",
+          top: "20px",
+          left: "50%",
+          transform: "translateX(-50%)",
+          backgroundColor: "#fef2f2",
+          color: "#991b1b",
+          padding: "12px 24px",
+          borderRadius: "8px",
+          border: "1px solid #fee2e2",
+          boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
+          zIndex: 1000,
+          display: "flex",
+          alignItems: "center",
+          gap: "10px",
+          animation: "slideDown 0.3s ease-out"
+        }}>
+          {alertMessage}
+          <button
+            onClick={() => setAlertMessage("")}
+            style={{ background: "none", border: "none", cursor: "pointer", color: "#991b1b", fontWeight: "bold" }}
+          >
+            ✕
+          </button>
+        </div>
+      )}
       <div style={{ display: "flex", gap: "30px" }}>
         {posterUrl && (
           <img

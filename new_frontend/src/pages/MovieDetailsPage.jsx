@@ -26,12 +26,12 @@ function MovieDetailsPage({ session }) {
     }, [id, movie]);
 
     if (loading) {
-        return <div className="loading-container"><div className="spinner"></div><p style={{ color: "white" }}>Loading movie details...</p></div>;
+        return <div className="loading-container"><div className="spinner"></div><p style={{ color: "#0f172a" }}>Loading movie details...</p></div>;
     }
 
     if (!movie) {
         return (
-            <div style={{ color: "white", padding: "40px", textAlign: "center" }}>
+            <div style={{ color: "#0f172a", padding: "40px", textAlign: "center" }}>
                 <p>Movie not found.</p>
                 <button onClick={() => navigate("/")} className="secondary-btn-full" style={{ width: 'auto', marginTop: '20px' }}>Go Home</button>
             </div>

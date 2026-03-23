@@ -99,3 +99,217 @@ TMDB Error: ('Connection aborted.', ConnectionResetError(10054, 'An existing con
 [2026-03-20 13:33:03.029593] Rec request for user: b47813ac-7a7e-49ba-aacd-42fda197cc1e
 TMDB Error: ('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))
 TMDB Error: ('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))
+[2026-03-20 18:42:10.457100] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+[2026-03-20 18:42:11.811019] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+[2026-03-20 18:45:31.969768] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+[2026-03-20 18:45:31.969768] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+TMDB Error: ('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))
+Returning 0 recommendations.
+[2026-03-20 18:57:48.601512] Rec request for user: b47813ac-7a7e-49ba-aacd-42fda197cc1e
+TMDB movie genres error for tmdb_id=1151083: ('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))
+Returning 0 recommendations.
+[2026-03-20 18:58:43.304872] Rec request for user: b47813ac-7a7e-49ba-aacd-42fda197cc1e
+TMDB discover error (orig_lang=True, vote_thr=30, page=3): ('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))
+TMDB discover error (orig_lang=False, vote_thr=50, page=2): ('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))
+TMDB discover error (orig_lang=False, vote_thr=50, page=3): ('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))
+TMDB discover error (orig_lang=False, vote_thr=50, page=2): ('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))
+TMDB discover error (orig_lang=False, vote_thr=30, page=2): ('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))
+TMDB discover error (orig_lang=False, vote_thr=30, page=3): ('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))
+Returning 0 recommendations.
+[2026-03-20 19:12:37.811315] Rec request for user: b47813ac-7a7e-49ba-aacd-42fda197cc1e
+Returning 10 recommendations.
+[2026-03-20 19:15:54.776112] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+[2026-03-20 19:16:05.175059] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+Returning 16 recommendations.
+Returning 16 recommendations.
+[2026-03-20 19:16:16.842543] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+Returning 16 recommendations.
+[2026-03-20 19:17:55.946690] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+Returning 16 recommendations.
+[2026-03-20 19:19:39.604427] Rec request for user: b47813ac-7a7e-49ba-aacd-42fda197cc1e
+TMDB discover error (genres=18,35,14, vote_thr=10, page=2): ('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))
+Returning 15 recommendations.
+[2026-03-20 19:24:03.598078] Rec request for user: b47813ac-7a7e-49ba-aacd-42fda197cc1e
+Returning 15 recommendations.
+[2026-03-20 19:26:12.203301] Rec request for user: b47813ac-7a7e-49ba-aacd-42fda197cc1e
+Returning 15 recommendations.
+[2026-03-20 19:28:04.888127] Rec request for user: b47813ac-7a7e-49ba-aacd-42fda197cc1e
+Returning 15 recommendations.
+[2026-03-20 19:40:52.288425] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+Returning 15 recommendations.
+[2026-03-20 19:41:08.545835] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+[2026-03-20 19:41:21.551111] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+[2026-03-20 19:41:21.551111] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+Returning 15 recommendations.
+Returning 15 recommendations.
+TMDB discover error (genres=35,14, vote_thr=20, page=1): ('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))
+Returning 15 recommendations.
+[2026-03-20 19:41:37.865090] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+Returning 15 recommendations.
+[2026-03-20 19:42:46.719505] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+TMDB movie genres error for tmdb_id=1260210: ('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))
+[2026-03-20 19:42:57.448043] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+[2026-03-20 19:43:00.612589] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+[2026-03-20 19:43:00.613587] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+[2026-03-20 19:43:03.448349] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+TMDB discover error (genres=28,12, vote_thr=20, page=1): ('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))
+Returning 15 recommendations.
+Returning 15 recommendations.
+TMDB discover error (genres=35,14, vote_thr=10, page=1): ('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))
+Returning 15 recommendations.
+Returning 15 recommendations.
+TMDB discover error (genres=35,14, vote_thr=20, page=1): ('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))
+TMDB discover error (genres=35,14, vote_thr=20, page=1): ('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))
+Returning 15 recommendations.
+[2026-03-20 19:45:26.939319] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+[2026-03-20 19:45:26.940317] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+Returning 15 recommendations.
+Returning 15 recommendations.
+[2026-03-20 19:46:12.570126] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+TMDB discover error (genres=35,14, vote_thr=20, page=1): ('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))
+Returning 15 recommendations.
+[2026-03-20 19:48:35.987589] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+[2026-03-20 19:48:35.988588] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+[2026-03-20 19:48:38.730334] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+[2026-03-20 19:48:38.738643] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+[2026-03-20 19:48:38.741040] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+[2026-03-20 19:48:38.744829] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+[2026-03-20 19:48:39.133484] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+[2026-03-20 19:48:39.137053] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+[2026-03-20 19:48:39.140597] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+[2026-03-20 19:48:39.142609] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+[2026-03-20 19:48:39.226188] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+[2026-03-20 19:48:39.283473] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+[2026-03-20 19:48:39.288143] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+[2026-03-20 19:48:39.291183] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+[2026-03-20 19:48:39.293500] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+[2026-03-20 19:48:39.440661] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+[2026-03-20 19:48:39.445439] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+[2026-03-20 19:48:39.447438] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+[2026-03-20 19:48:39.449802] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+DB Error: connection to server at "aws-1-ap-southeast-2.pooler.supabase.com" (52.62.122.103), port 5432 failed: FATAL:  MaxClientsInSessionMode: max clients reached - in Session mode max clients are limited to pool_size
+
+[2026-03-20 19:48:43.794736] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+[2026-03-20 19:48:43.795744] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+TMDB discover error (genres=28,80,53,35,14, vote_thr=20, page=1): ('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))
+TMDB movie genres error for tmdb_id=627336: ('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))
+TMDB movie genres error for tmdb_id=1260210: ('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))
+TMDB movie genres error for tmdb_id=1260210: ('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))
+TMDB discover error (genres=28,80,53,35,14, vote_thr=10, page=1): ('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))
+TMDB discover error (genres=28,80,53, vote_thr=20, page=1): ('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))
+[2026-03-20 19:48:57.285301] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+TMDB discover error (genres=28,80, vote_thr=20, page=1): ('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))
+Returning 15 recommendations.
+TMDB discover error (genres=35,14, vote_thr=20, page=1): ('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))
+[2026-03-20 19:48:58.699845] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+Returning 15 recommendations.
+TMDB discover error (genres=28,80,53, vote_thr=10, page=1): ('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))
+Returning 15 recommendations.
+TMDB discover error (genres=28,80, vote_thr=20, page=1): ('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))
+Returning 15 recommendations.
+TMDB discover error (genres=35,14, vote_thr=20, page=1): ('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))
+Returning 15 recommendations.
+Returning 15 recommendations.
+[2026-03-20 19:49:06.615800] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+Returning 15 recommendations.
+Returning 15 recommendations.
+Returning 15 recommendations.
+TMDB discover error (genres=28,80,53,35,14, vote_thr=10, page=1): ('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))
+Returning 15 recommendations.
+[2026-03-20 19:49:21.748628] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+Returning 15 recommendations.
+[2026-03-20 19:49:40.192580] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+Returning 15 recommendations.
+[2026-03-20 19:49:56.074450] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+TMDB discover error (genres=28,80,53,35,14, vote_thr=20, page=1): ('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))
+TMDB discover error (genres=28,80,53, vote_thr=10, page=1): ('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))
+Returning 15 recommendations.
+[2026-03-20 19:50:59.284738] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+[2026-03-20 19:51:00.231572] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+[2026-03-20 19:51:00.287110] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+[2026-03-20 19:51:00.292579] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+[2026-03-20 19:51:00.295207] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+[2026-03-20 19:51:00.296532] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+[2026-03-20 19:51:00.425036] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+[2026-03-20 19:51:00.426327] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+[2026-03-20 19:51:00.429763] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+[2026-03-20 19:51:00.433261] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+[2026-03-20 19:51:00.434633] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+Returning 15 recommendations.
+TMDB discover error (genres=28,80,53, vote_thr=20, page=1): ('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))
+Returning 15 recommendations.
+Returning 15 recommendations.
+Returning 15 recommendations.
+Returning 15 recommendations.
+TMDB discover error (genres=28,80, vote_thr=20, page=1): ('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))
+Returning 15 recommendations.
+Returning 15 recommendations.
+Returning 15 recommendations.
+Returning 15 recommendations.
+Returning 15 recommendations.
+Returning 15 recommendations.
+Returning 15 recommendations.
+[2026-03-20 19:55:03.600849] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+[2026-03-20 19:55:03.600849] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+[2026-03-20 19:55:10.417207] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+TMDB discover error (genres=28,80,53,35,14, vote_thr=10, page=1): ('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))
+Returning 15 recommendations.
+Returning 15 recommendations.
+Returning 15 recommendations.
+[2026-03-20 19:56:04.702522] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+[2026-03-20 19:56:04.702522] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+TMDB discover error (genres=28,80,53, vote_thr=10, page=1): ('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))
+Returning 15 recommendations.
+Returning 15 recommendations.
+[2026-03-20 19:57:31.936524] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+TMDB discover error (genres=35,14, vote_thr=20, page=1): ('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))
+Returning 15 recommendations.
+[2026-03-20 19:57:46.969376] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+Returning 15 recommendations.
+[2026-03-20 19:58:06.979504] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+[2026-03-20 19:58:06.980850] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+[2026-03-20 19:58:07.016380] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+[2026-03-20 19:58:07.017690] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+[2026-03-20 19:58:07.017690] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+TMDB discover error (genres=35,14, vote_thr=10, page=1): ('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))
+Returning 15 recommendations.
+Returning 15 recommendations.
+Returning 15 recommendations.
+Returning 15 recommendations.
+Returning 15 recommendations.
+[2026-03-20 19:58:57.291605] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+[2026-03-20 19:58:57.292607] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+[2026-03-20 19:58:57.298168] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+[2026-03-20 19:58:57.304461] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+[2026-03-20 19:58:57.319685] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+TMDB discover error (genres=35,14, vote_thr=20, page=1): ('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))
+TMDB discover error (genres=35,14, vote_thr=20, page=1): ('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))
+Returning 15 recommendations.
+Returning 15 recommendations.
+Returning 15 recommendations.
+Returning 15 recommendations.
+Returning 15 recommendations.
+[2026-03-20 20:00:42.458354] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+Returning 15 recommendations.
+[2026-03-20 20:00:59.357311] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+[2026-03-20 20:01:05.936323] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+[2026-03-20 20:01:05.938238] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+[2026-03-20 20:01:05.941273] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+[2026-03-20 20:01:05.945278] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+[2026-03-20 20:01:05.949318] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+TMDB discover error (genres=35,14, vote_thr=10, page=1): ('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))
+Returning 15 recommendations.
+Returning 15 recommendations.
+Returning 15 recommendations.
+TMDB discover error (genres=35, vote_thr=20, page=1): ('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))
+Returning 15 recommendations.
+Returning 15 recommendations.
+Returning 15 recommendations.
+[2026-03-20 20:01:34.158497] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+Returning 15 recommendations.
+[2026-03-20 20:02:39.058295] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+[2026-03-20 20:02:39.059582] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+Returning 15 recommendations.
+Returning 15 recommendations.
+[2026-03-20 20:07:31.609365] Rec request for user: d2c203b3-df74-431c-a9aa-8f18f5426078
+Returning 15 recommendations.

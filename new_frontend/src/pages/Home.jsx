@@ -13,6 +13,7 @@ function Home({ session, handleLogout }) {
     const [searchQuery, setSearchQuery] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
     const [isLoading, setIsLoading] = useState(true);
+    const [errorMessage, setErrorMessage] = useState("");
     const [darkMode, setDarkMode] = useState(true);
     const navigate = useNavigate();
 
@@ -22,16 +23,27 @@ function Home({ session, handleLogout }) {
     // ✅ Fetch movies from backend
     useEffect(() => {
         setIsLoading(true);
-        fetch("http://127.0.0.1:8000/movies")
+        setErrorMessage("");
+
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // avoid "frozen" spinner
+
+        fetch("http://127.0.0.1:8000/movies", { signal: controller.signal })
             .then((res) => res.json())
             .then((data) => {
                 setMoviesData(data);
                 setIsLoading(false);
             })
             .catch((err) => {
-                console.error("Error fetching movies:", err);
+                if (err?.name === "AbortError") {
+                    setErrorMessage("Request timed out while loading movies.");
+                } else {
+                    setErrorMessage("Failed to load movies from the backend.");
+                    console.error("Error fetching movies:", err);
+                }
                 setIsLoading(false);
-            });
+            })
+            .finally(() => clearTimeout(timeoutId));
     }, []);
 
     // Apply filtering
@@ -104,6 +116,13 @@ function Home({ session, handleLogout }) {
                     <div className="loading-container">
                         <div className="spinner"></div>
                         <p className="loading-text">Bringing you the best movies...</p>
+                    </div>
+                ) : errorMessage ? (
+                    <div style={{ padding: "40px", textAlign: "center" }}>
+                        <p style={{ fontWeight: 700, color: "#0f172a" }}>{errorMessage}</p>
+                        <p style={{ color: "#64748b" }}>
+                            Make sure your backend is running at <code>http://127.0.0.1:8000</code>.
+                        </p>
                     </div>
                 ) : (
                     <>

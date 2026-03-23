@@ -15,7 +15,12 @@ function RecommendationsPage({ session }) {
         if (!user) return;
 
         setLoading(true);
-        fetch(`http://127.0.0.1:8000/recommendations/${user.id}?t=${Date.now()}`)
+        setMessage("");
+
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 20000);
+
+        fetch(`http://127.0.0.1:8000/recommendations/${user.id}?t=${Date.now()}`, { signal: controller.signal })
             .then(res => res.json())
             .then(data => {
                 if (data.movies && data.movies.length === 0) {
@@ -33,9 +38,16 @@ function RecommendationsPage({ session }) {
                 setLoading(false);
             })
             .catch(err => {
-                console.error("Error fetching recommendations:", err);
+                if (err?.name === "AbortError") {
+                    setMessage("Request timed out while loading recommendations.");
+                } else {
+                    setMessage("Failed to load recommendations from the backend.");
+                    console.error("Error fetching recommendations:", err);
+                }
+                setMovies([]);
                 setLoading(false);
-            });
+            })
+            .finally(() => clearTimeout(timeoutId));
     }, [user, location.key]);
 
     const handleLogout = async () => {

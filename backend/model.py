@@ -5,111 +5,118 @@ import re
 
 sentiment_model = pipeline(
     "sentiment-analysis",
-    model="cardiffnlp/twitter-xlm-roberta-base-sentiment"
+    model="nlptown/bert-base-multilingual-uncased-sentiment"
 )
 
 ASPECT_KEYWORDS = {
-    "acting": ["acting","performance","actor","actress","cast","portrayal"],
-    "story": ["story","plot","screenplay","narrative","storyline"],
-    "music": ["music","bgm","soundtrack","score","songs"],
-    "direction": ["direction","director","directed","filmmaking"],
-    "visuals": ["visuals","cinematography","vfx","effects","shots"]
+    "acting": ["acting", "performance", "actor", "actress", "cast", "portrayal"],
+    "story": ["story", "plot", "screenplay", "narrative", "storyline"],
+    "music": ["music", "bgm", "soundtrack", "score", "songs"],
+    "direction": ["direction", "director", "directed", "filmmaking"],
+    "visuals": ["visuals", "cinematography", "vfx", "effects", "shots"]
 }
 
 
 def split_sentences(review):
-
     pattern = r'but|and|even though|although|while|however|notably|,|\.'
     parts = re.split(pattern, review.lower())
-
     return [p.strip() for p in parts if p.strip()]
 
 
 def detect_aspect(sentence):
-
     for aspect, words in ASPECT_KEYWORDS.items():
         for w in words:
             if w in sentence:
                 return aspect
-
     return None
 
 
 def sentiment_to_rating(label, score):
+    """
+    nlptown model returns labels like '1 star', '2 stars', ..., '5 stars'.
+    We map these directly to a 0-5 scale with a slight score-based nudge.
+    """
+    stars = int(label.split()[0])  # extract the number from "3 stars"
+    # Nudge slightly within the star bucket based on confidence
+    # e.g. a very confident 4-star is closer to 4.5, a weak one closer to 3.5
+    nudge = (score - 0.5) * 0.8  # ranges roughly from -0.4 to +0.4
+    rating = stars + nudge
+    rating = max(0.0, min(5.0, rating))
+    return float(round(rating, 1))
 
-    if label == "positive":
-        rating = 3 + (score * 2)
 
-    elif label == "negative":
-        rating = 2 - (score * 2)
+def analyze_long_text(text):
+    """
+    Splits long reviews into word-based chunks (~80 words each, ~400 tokens)
+    to avoid truncation. Returns averaged label + score.
+    """
+    words = text.split()
+    chunk_size = 80
+    chunks = [
+        " ".join(words[i:i + chunk_size])
+        for i in range(0, len(words), chunk_size)
+    ]
 
-    else:
-        rating = 2.5
+    results = [sentiment_model(chunk)[0] for chunk in chunks]
 
-    rating = max(0, min(5, rating))
+    # Average star ratings across chunks
+    star_scores = [int(r["label"].split()[0]) for r in results]
+    confidence_scores = [r["score"] for r in results]
 
-    return float(round(rating,1))
+    avg_stars = np.mean(star_scores)
+    avg_confidence = np.mean(confidence_scores)
 
-import re
+    # Reconstruct a synthetic label from the average
+    rounded = int(round(avg_stars))
+    rounded = max(1, min(5, rounded))
+    synthetic_label = f"{rounded} star{'s' if rounded > 1 else ''}"
+
+    return {"label": synthetic_label, "score": float(avg_confidence)}
+
 
 def detect_spam(review):
-
     spam_score = 0
     text = review.lower()
 
-    # 1 Excessive punctuation
     if review.count("!") > 4:
         spam_score += 1
 
-    # 2 Repeated words (Aggressive spam check)
     words = text.split()
     if len(words) > 5:
         unique_words = set(words)
         if len(unique_words) < len(words) * 0.5:
             spam_score += 1
 
-    # 3 Too many uppercase letters
     if sum(1 for c in review if c.isupper()) > len(review) * 0.5:
         spam_score += 1
 
-    # 4 Promotional words
     promo_words = ["buy now", "watch now", "subscribe", "click here"]
-
     for p in promo_words:
         if p in text:
             spam_score += 1
 
-    # 5 Repeated characters
     if re.search(r'(.)\1{3,}', text):
         spam_score += 1
 
     return spam_score >= 2
 
 
-
-
 def is_meaningless(text):
     """Detects if a review is gibberish or lacks any substance."""
     text = text.strip()
-    
-    # 1. Very short reviews (excluding common short positive/negative words)
+
     common_short_words = {"good", "bad", "nice", "okay", "ok", "cool", "wow", "avg", "meh", "yes", "no", "hi", "hey"}
     if len(text) < 2:
         return True, "Your review is too short to be meaningful."
     if len(text) < 3 and text.lower() not in common_short_words:
         return True, "Please provide a more descriptive review."
 
-    # 2. Check for keyboard mash (e.g., "asdfghjkl", "qwerty")
-    # Increased threshold from 5 to 8 to avoid flagging words like "power", "quiet", "glass"
     if re.search(r'[asdfghjkl]{8,}|[qwertyuiop]{8,}|[zxcvbnm]{8,}', text.lower()):
         return True, "Please provide a review with actual words."
 
-    # 3. Repeat character strings (e.g., "aaaaaaaaaa", "!!!!!!!!!")
     if re.search(r'(.)\1{4,}', text):
         return True, "Your review contains too many repeated characters."
 
-    # 4. Check vowel ratio (gibberish often lacks vowels or has too many)
-    # Include 'y' as a vowel and loosen the ratio for words like "rhythm"
     letters = re.sub(r'[^a-zA-Z]', '', text)
     if len(letters) > 4:
         vowels = len(re.findall(r'[aeiouyAEIOUY]', letters))
@@ -117,7 +124,6 @@ def is_meaningless(text):
         if vowel_ratio < 0.05 or vowel_ratio > 0.9:
             return True, "The text seems to be gibberish. Please write a proper review."
 
-    # 5. Check for purely numerical or symbolic input
     if not re.search(r'[a-zA-Z]', text):
         return True, "A review must contain at least some letters."
 
@@ -125,7 +131,7 @@ def is_meaningless(text):
 
 
 def analyze(review):
-    # First, check for gibberish/meaningless content
+    # Check for gibberish/meaningless content
     meaningless, msg = is_meaningless(review)
     if meaningless:
         return {
@@ -146,46 +152,35 @@ def analyze(review):
             "is_meaningless": False,
             "message": "⚠️ This review was flagged as spam and will not affect ratings."
         }
-    sentences = split_sentences(review)
 
+    sentences = split_sentences(review)
     aspect_scores = {}
 
     for s in sentences:
-
         aspect = detect_aspect(s)
-
         if not aspect:
             continue
 
-        result = sentiment_model(s)[0]
-
-        label = result["label"].lower()
+        # Use chunked analysis per sentence (handles long sentences too)
+        result = analyze_long_text(s)
+        label = result["label"]
         score = result["score"]
-
         rating = sentiment_to_rating(label, score)
-
         aspect_scores.setdefault(aspect, []).append(rating)
 
-
     aspect_ratings = {}
-
     for aspect, scores in aspect_scores.items():
-        aspect_ratings[aspect] = float(round(np.mean(scores),1))
+        aspect_ratings[aspect] = float(round(np.mean(scores), 1))
 
-
+    # Fallback: no aspects detected — analyze full review
     if not aspect_ratings:
-
-        result = sentiment_model(review)[0]
-
-        label = result["label"].lower()
+        result = analyze_long_text(review)
+        label = result["label"]
         score = result["score"]
-
         overall = sentiment_to_rating(label, score)
-
         aspect_ratings["overall"] = overall
 
-
-    overall_rating = float(round(np.mean(list(aspect_ratings.values())),1))
+    overall_rating = float(round(np.mean(list(aspect_ratings.values())), 1))
 
     if overall_rating >= 4:
         sentiment = "positive"
@@ -194,10 +189,10 @@ def analyze(review):
     else:
         sentiment = "negative"
 
-
     return {
         "rating": overall_rating,
         "sentiment": sentiment,
         "aspects": aspect_ratings,
-        "is_spam": False
+        "is_spam": False,
+        "is_meaningless": False
     }

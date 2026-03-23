@@ -26,7 +26,11 @@ def get_db_connection():
         user="postgres.apdzemtysvmlojlwkjxu",
         password="souravgenshin",
         port="5432",
-        sslmode="require"
+        sslmode="require",
+        # Prevent frontend "frozen" loading when the DB is slow/unreachable.
+        connect_timeout=8,
+        # Hard limit to avoid long-running queries.
+        options="-c statement_timeout=20000"
     )
 
 # =========================
@@ -361,14 +365,13 @@ def get_user_reviews(user_id: str):
 
 @app.get("/recommendations/{user_id}")
 def get_recommendations(user_id: str):
-    import google.generativeai as genai
-    
     # Simple logging to a file
     with open("rec_log.txt", "a") as f:
         f.write(f"\n[{datetime.now()}] Rec request for user: {user_id}")
 
-    gemini_key = os.getenv("GEMINI_API_KEY")
     api_key = os.getenv("TMDB_API_KEY")
+    if not api_key:
+        return {"message": "TMDB_API_KEY missing", "movies": []}
 
     try:
         conn = get_db_connection()
@@ -376,19 +379,16 @@ def get_recommendations(user_id: str):
 
         # 1. Get titles and ratings (Order by latest first)
         cursor.execute("""
-            SELECT m.title, r.rating, m.tmdb_id
+            SELECT m.title, r.rating, r.sentiment, m.tmdb_id
             FROM reviews r
             JOIN movies m ON r.movie_id = m.id
-            WHERE r.user_id = %s
+            WHERE r.user_id = %s AND (r.is_spam = FALSE OR r.is_spam IS NULL)
             ORDER BY r.created_at DESC;
         """, (user_id,))
         reviewed_movies = cursor.fetchall()
 
-        # Get IDs already reviewed
-        cursor.execute("SELECT movie_id FROM reviews WHERE user_id = %s", (user_id,))
-        reviewed_movie_ids = {str(row[0]) for row in cursor.fetchall()}
-        # Also include TMDB IDs in the reviewed set
-        reviewed_tmdb_ids = {str(m[2]) for m in reviewed_movies if m[2]}
+        # Exclude TMDB IDs already reviewed
+        reviewed_tmdb_ids = {str(m[3]) for m in reviewed_movies if m and m[3]}
 
         cursor.close()
         conn.close()
@@ -399,98 +399,219 @@ def get_recommendations(user_id: str):
     if not reviewed_movies:
         return {"message": "Review some movies first to get personalized recommendations!", "movies": []}
 
-    # 2. Taste Analysis
-    movie_list_str = ", ".join([f"{m[0]}" for m in reviewed_movies])
-    keywords = ""
-    reasoning = "Based on your interest in " + ", ".join([m[0] for m in reviewed_movies[:2]])
-    
-    if gemini_key:
-        try:
-            genai.configure(api_key=gemini_key)
-            model = genai.GenerativeModel('gemini-1.5-flash')
-            prompt = f"""
-            User has reviewed: {movie_list_str}.
-            Analyze their taste. Provide:
-            1. A comma-separated list of 5-8 TMDB genre IDs or keywords.
-            2. A one-sentence explanation (reasoning).
-            Format:
-            KEYWORDS: [ids/keywords]
-            EXPLANATION: [sentence]
-            """
-            response = model.generate_content(prompt)
-            text = response.text
-            with open("rec_log.txt", "a") as f: f.write(f"\nGemini response: {text[:100]}")
-            
-            if "KEYWORDS:" in text:
-                k_part = text.split("KEYWORDS:")[1].split("EXPLANATION:")[0]
-                keywords = k_part.strip().replace("[", "").replace("]", "")
-            if "EXPLANATION:" in text:
-                reasoning = text.split("EXPLANATION:")[1].strip().replace("[", "").replace("]", "")
-        except Exception as e:
-            with open("rec_log.txt", "a") as f: f.write(f"\nGemini Error: {e}")
+    # 2. Derive genres from the user's previously reviewed movies (same TMDB API).
+    import time
+    # Weight genres by the user's rating so "liked" movies influence recommendations more.
+    genre_weight = {}
 
-    # 2.5 - Hard Fallback if Gemini failed or is missing
-    if not keywords:
-        # Simple mapping-based genre extraction if DB column failed
-        # Common Action/Sci-Fi/Drama mapped based on typical titles (Simulated AI)
-        all_reviewed_titles = " ".join([m[0].lower() for m in reviewed_movies])
-        detected_genres = []
-        if any(w in all_reviewed_titles for w in ["action", "hero", "war", "fight", "man", "avenger"]): detected_genres.append("28") # Action
-        if any(w in all_reviewed_titles for w in ["love", "romance", "heart", "story"]): detected_genres.append("10749") # Romance
-        if any(w in all_reviewed_titles for w in ["scary", "horror", "ghost", "dead"]): detected_genres.append("27") # Horror
-        if any(w in all_reviewed_titles for w in ["space", "future", "alien", "tech"]): detected_genres.append("878") # Sci-Fi
-        if any(w in all_reviewed_titles for w in ["laugh", "comedy", "funny", "joke"]): detected_genres.append("35") # Comedy
-        
-        keywords = ",".join(detected_genres) if detected_genres else "28,12" # Default to Action/Adventure
-        reasoning = f"Based on your interest in {reviewed_movies[0][0]} and similar stories."
+    def add_genres_from_tmdb(tmdb_id: str, rating: float):
+        tmdb_movie_url = f"https://api.themoviedb.org/3/movie/{tmdb_id}"
+        # Retry to avoid intermittent connection resets.
+        last_err = None
+        for attempt in range(3):
+            try:
+                resp = requests.get(
+                    tmdb_movie_url,
+                    params={"api_key": api_key, "language": "en-US"},
+                    timeout=8,
+                )
+                resp.raise_for_status()
+                payload = resp.json()
+                break
+            except Exception as e:
+                last_err = e
+                time.sleep(0.6 * (attempt + 1))
+        else:
+            raise last_err
+
+        for g in payload.get("genres", []) or []:
+            gid = str(g.get("id"))
+            if not gid:
+                continue
+            genre_weight[gid] = genre_weight.get(gid, 0) + float(rating)
+
+    # Use only positive reviews to derive taste; if the user has no positives,
+    # fall back to all non-spam reviews.
+    positive_reviews = [m for m in reviewed_movies if (m[2] == "positive" or (m[1] is not None and float(m[1]) >= 4.0))]
+    source_movies = positive_reviews if positive_reviews else reviewed_movies
+
+    # Only use TMDB ids we have in the DB
+    used = 0
+    for (title, rating, sentiment, tmdb_id) in source_movies:
+        if not tmdb_id:
+            continue
+        try:
+            add_genres_from_tmdb(str(tmdb_id), rating)
+            used += 1
+        except Exception as e:
+            # Keep going even if a single TMDB call fails.
+            with open("rec_log.txt", "a") as f:
+                f.write(f"\nTMDB movie genres error for tmdb_id={tmdb_id}: {e}")
+        if used >= 4:
+            break  # cap external calls per request
+
+    if not genre_weight:
+        # Reasonable default if TMDB genre fetch fails.
+        genre_ids = ["28", "12"]
+    else:
+        sorted_genres = sorted(genre_weight.items(), key=lambda x: x[1], reverse=True)
+        # Pick top 5 genres for "same or related" recommendations
+        genre_ids = [gid for gid, _w in sorted_genres[:5]]
+
+    # 2.1 Reasoning text (use genre names when possible)
+    reasoning = "Based on your previous reviews, here are movies you may like."
+    try:
+        genre_list_url = "https://api.themoviedb.org/3/genre/movie/list"
+        last_err = None
+        for attempt in range(3):
+            try:
+                resp = requests.get(
+                    genre_list_url,
+                    params={"api_key": api_key, "language": "en-US"},
+                    timeout=8,
+                )
+                resp.raise_for_status()
+                genres_payload = resp.json()
+                break
+            except Exception as e:
+                last_err = e
+                time.sleep(0.6 * (attempt + 1))
+        else:
+            raise last_err
+
+        id_to_name = {str(g["id"]): g.get("name") for g in (genres_payload.get("genres", []) or []) if g.get("id") is not None}
+
+        top_names = [id_to_name.get(gid) for gid in genre_ids if id_to_name.get(gid)]
+        liked_titles = [t for (t, r, _sent, _tmdb) in reviewed_movies[:4] if r is not None and float(r) >= 4.0]
+        if liked_titles and top_names:
+            reasoning = f"Because you enjoyed {liked_titles[0]} and similar styles: {', '.join(top_names[:3])}."
+        elif top_names:
+            reasoning = f"Because you tend to rate these genres highly: {', '.join(top_names[:3])}."
+    except Exception:
+        pass
 
     # 3. TMDB Discovery
     import random
+    import time
     tmdb_url = "https://api.themoviedb.org/3/discover/movie"
-    # Basic params - Add random page for freshness
-    random_page = random.randint(1, 3) 
-    params = {
-        "api_key": api_key,
-        "sort_by": "popularity.desc",
-        "language": "en-US",
-        "page": random_page,
-        "vote_count.gte": 80 # Lowered slightly for more variety
-    }
+    discovered_pages = [1]  # keep extremely low for responsiveness
+    vote_count_thresholds = [20, 10]  # loosen slightly to avoid empty responses
 
-    if keywords:
-        # Check if IDs or text
-        parts = [p.strip() for p in keywords.split(",")]
-        ids = [p for p in parts if p.isdigit()]
-        if ids:
-            params["with_genres"] = ",".join(ids)
-        else:
-            params["with_keywords"] = keywords
+    def tmdb_get_json(url: str, params: dict, timeout: int = 8, retries: int = 2):
+        last_err = None
+        for attempt in range(retries):
+            try:
+                r = requests.get(url, params=params, timeout=timeout)
+                r.raise_for_status()
+                return r.json()
+            except Exception as e:
+                last_err = e
+                # Small backoff before retrying
+                time.sleep(0.3 * (attempt + 1))
+        raise last_err
+
+    def discover(with_genres_csv, vote_count_gte: int, page: int):
+        params = {
+            "api_key": api_key,
+            "sort_by": "popularity.desc",
+            "language": "en-US",
+            "page": page,
+            "with_original_language": "ml",  # Malayalam-only
+        }
+        if vote_count_gte > 0:
+            params["vote_count.gte"] = vote_count_gte
+        if with_genres_csv:
+            params["with_genres"] = with_genres_csv
+        return tmdb_get_json(tmdb_url, params=params).get("results", [])
+
+    # 4. Filter, upsert into DB, and format
+    recommendations = []
+    seen_tmdb_ids = set()
+
+    # Re-open DB connection for upsert.
+    conn = get_db_connection()
+    cursor = conn.cursor()
 
     try:
-        response = requests.get(tmdb_url, params=params)
-        response.raise_for_status()
-        tmdb_results = response.json().get("results", [])
-    except Exception as e:
-        with open("rec_log.txt", "a") as f: f.write(f"\nTMDB Error: {e}")
-        return {"message": "Failed to fetch from TMDB.", "movies": []}
+        # Malayalam-only + genre-relaxation fallback:
+        # Try top N genres first (N=5,4,3,2,1), then finally Malayalam-only without genre filter.
+        genre_sets = [
+            genre_ids[:5],
+            genre_ids[:3],
+            genre_ids[:2],
+            genre_ids[:1],
+            None,  # still Malayalam-only (no with_genres)
+        ]
 
-    # 4. Filter and Format
-    recommendations = []
-    for m in tmdb_results:
-        tmdb_id = str(m.get("id"))
-        # Exclude if already reviewed (by TMDB ID or internal ID)
-        if tmdb_id in reviewed_tmdb_ids or tmdb_id in reviewed_movie_ids:
-            continue
-            
-        recommendations.append({
-            "id": tmdb_id,
-            "title": m.get("title"),
-            "poster_path": m.get("poster_path"),
-            "release_date": m.get("release_date"),
-            "overview": m.get("overview"),
-            "avg_rating": m.get("vote_average"),
-            "ai_reason": reasoning
-        })
+        for genre_list in genre_sets:
+            with_genres_csv = ",".join(genre_list) if genre_list else None
+            for vote_thr in vote_count_thresholds:
+                for page in discovered_pages:
+                    try:
+                        tmdb_results = discover(with_genres_csv, vote_thr, page)
+                    except Exception as e:
+                        with open("rec_log.txt", "a") as f:
+                            f.write(f"\nTMDB discover error (genres={with_genres_csv}, vote_thr={vote_thr}, page={page}): {e}")
+                        continue
 
-    with open("rec_log.txt", "a") as f: f.write(f"\nReturning {len(recommendations)} recommendations.")
+                    for m in tmdb_results:
+                        tmdb_id = str(m.get("id"))
+                        if not tmdb_id:
+                            continue
+                        if tmdb_id in reviewed_tmdb_ids or tmdb_id in seen_tmdb_ids:
+                            continue
+
+                        # Ensure the movie exists in your `movies` table.
+                        cursor.execute("SELECT id FROM movies WHERE tmdb_id = %s", (tmdb_id,))
+                        row = cursor.fetchone()
+                        if row:
+                            internal_id = row[0]
+                        else:
+                            cursor.execute(
+                                """
+                                INSERT INTO movies (tmdb_id, title, poster_path, release_date, overview, avg_rating)
+                                VALUES (%s, %s, %s, %s, %s, %s)
+                                RETURNING id;
+                                """,
+                                (
+                                    tmdb_id,
+                                    m.get("title"),
+                                    m.get("poster_path"),
+                                    m.get("release_date"),
+                                    m.get("overview"),
+                                    float(m.get("vote_average") or 0.0),
+                                ),
+                            )
+                            internal_id = cursor.fetchone()[0]
+                            conn.commit()
+
+                        recommendations.append(
+                            {
+                                "id": internal_id,  # IMPORTANT: frontend expects internal `movies.id`
+                                "title": m.get("title"),
+                                "poster_path": m.get("poster_path"),
+                                "release_date": m.get("release_date"),
+                                "overview": m.get("overview"),
+                                "avg_rating": m.get("vote_average"),
+                                "ai_reason": reasoning,
+                                "tmdb_id": tmdb_id,
+                            }
+                        )
+                        seen_tmdb_ids.add(tmdb_id)
+
+                        if len(recommendations) >= 15:
+                            break
+
+                    if len(recommendations) >= 15:
+                        break
+                if len(recommendations) >= 15:
+                    break
+            if len(recommendations) >= 15:
+                break
+    finally:
+        cursor.close()
+        conn.close()
+
+    with open("rec_log.txt", "a") as f:
+        f.write(f"\nReturning {len(recommendations)} recommendations.")
     return recommendations[:15]
